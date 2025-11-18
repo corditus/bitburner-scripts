@@ -44,10 +44,6 @@ async function HacknetNodes(ns){
   }
 }
 
-
-//Classes for managing botnet
-// 
-
 async function Botnet(ns){
   // if(DEBUG)console.log(`[tick] tacking a tick.`);
   return await {
