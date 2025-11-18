@@ -13,16 +13,31 @@ myAnimal.speak(); // Output: Buddy makes a noise.
 // };
 /** @param {NS} ns */
 export class Server {
-  constructor(ns, name) {
+  constructor(ns, name, server=ns.getServer(name)) {
     this.ns = ns;
     this.name = name;
     this.ports = {
-        "ssh":false,
-        "ftp":false,
-        "smtp":false,
-        "http":false,
-        "sql":false,
+        "ssh":server?.sshPortOpen||false,
+        "ftp":server?.ftpPortOpen||false,
+        "smtp":server?.smtpPortOpen||false,
+        "http":server?.httpPortOpen||false,
+        "sql":server?.sqlPortOpen||false,
     }
+  }
+
+  gainRootAccess(){
+    if (this.ns.hasRootAccess(this.name)){
+        this.ns.toast(`[${this.name}] already has root access`,'info',2000);
+        return true;
+    }
+    const req_ports = this.ns.getServerNumPortsRequired(this.name);
+    let opened_ports = 0;
+    for (const port in this.ports){
+        if (this.ports[port]===true){
+            opened_ports += 1;
+        }
+    }
+    
   }
 
   openPorts(portTypes=[Object.keys(this.ports)]){
@@ -33,29 +48,29 @@ export class Server {
         },
         "ftp":{
             file:"FTPCrack.exe",
-            command:this.ns.ftpcrack,
+            command:(targetName=this.name)=>{return this.ns.ftpcrack(targetName)},
         },
         "smtp":{
             file:"relaySMTP.exe",
-            command:this.ns.relaysmtp,
+            command:this.ns.relaysmtp(this.name),
         },
         "http":{
             file:"HTTPWorm.exe",
-            command:this.ns.httpworm,
+            command:this.ns.httpworm(this.name),
         },
         "sql":{
             file:"SQLInject.exe",
-            command:this.ns.sqlinject,
+            command:this.ns.sqlinject(this.name),
         }
     };
     for (const portType of portTypes){
         if (this.ns.fileExists(portCracks[portType].file,this.name)){
-            const portCracked = portCracks[portType].command(this.name);
-            if (portCracked=== true){
+            const portCracked = portCracks[portType].command();
+            if (portCracked===true){
                 this.ports[portType]=true;
                 ns.toast(`[${this.name}] opened port: ${portType}`,'success',2000);
             }else{
-                ns.toast(`[${this.name}] failed to open port: ${portType}`,'error',2000);
+                ns.toast(`[${this.name}] failed opening port: ${portType}`,'error',2000);
             }
         }
     };
@@ -67,15 +82,15 @@ export class Server {
   }
 }
 
-export class PurchasedServer extends Server {
-    constructor(ns, name) {
-        super(ns, name);
-        this.ns = ns;
-        this.name = name;
-        this.maxRam = ns.getServerMaxRam(name);
-        this.usedRam = ns.getServerUsedRam(name);
-        this.availableRam = this.maxRam - this.usedRam;
-    }
+// export class PurchasedServer extends Server {
+//     constructor(ns, name) {
+//         super(ns, name);
+//         this.ns = ns;
+//         this.name = name;
+//         this.maxRam = ns.getServerMaxRam(name);
+//         this.usedRam = ns.getServerUsedRam(name);
+//         this.availableRam = this.maxRam - this.usedRam;
+//     } 
 
 
-}
+// }
