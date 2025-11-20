@@ -57,7 +57,7 @@ export async function main(ns) {
 	ns.exec("/scripts/copy_scripts.js", "home", 1, host)
 	let threads = parseInt(ns.getServerMaxRam(host) / ns.getScriptRam(script))
 	if (threads == 0) {
-		ns.print(host + " cannot run script. No RAM")
+		// ns.print(host + " cannot run script. No RAM")
 		ns.exit()
 	}
 	let pid = ns.exec(script, host, threads, server)
@@ -65,5 +65,5 @@ export async function main(ns) {
 	  await ns.sleep(500)
 	  ns.exec(script, host, threads, server)
 	}
-	ns.tprint(action, " executed on ", host, " for ", server, " with ", threads, " threads")
+	// ns.tprint(action, " executed on ", host, " for ", server, " with ", threads, " threads")
 }
